@@ -1,10 +1,10 @@
 import React from 'react';
-import SearchPage from './components/SearchPage';
+import RAGPage from './components/RAGPage';
 
 function App() {
   return (
     <div className="min-h-screen bg-gray-50">
-      <SearchPage />
+      <RAGPage />
     </div>
   );
 }
