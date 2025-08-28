@@ -24,7 +24,7 @@ class RAGService:
         self.mistral_client = Mistral(api_key=mistral_api_key)
         self.embedding_service = embedding_service
         self.model = "mistral-small-latest"  # Modelo eficiente y rápido
-        
+
         logger.info("RAG Service inicializado con Mistral AI")
 
     def _create_system_prompt(self) -> str:
@@ -36,16 +36,16 @@ Tu función es ayudar a los usuarios respondiendo preguntas sobre esta legislaci
 INSTRUCCIONES IMPORTANTES:
 1. Responde ÚNICAMENTE basándote en los artículos proporcionados como contexto
 2. Si la información no está en los artículos proporcionados, indícalo claramente
-3. Cita siempre los números de artículos relevantes en tu respuesta
-4. Sé claro, conciso y directo
 5. Usa un lenguaje profesional pero accesible
 6. Estructura tu respuesta de manera organizada
 7. Si hay múltiples artículos relevantes, organiza la información lógicamente
 
 FORMATO DE RESPUESTA:
+- Responde en texto plano sin usar formato Markdown
+- NO uses asteriscos (*), guiones bajos (_) ni otros símbolos de formato
 - Comienza con una respuesta directa a la pregunta
+- Luego explica de manera natural y detallada
 - Incluye los detalles específicos de los artículos
-- Menciona los números de artículos consultados
 - Si es necesario, proporciona contexto adicional
 
 Recuerda: Tu objetivo es ser un consultor legal confiable y preciso para temas de tránsito en Cuba."""
@@ -125,7 +125,7 @@ Por favor, responde basándote únicamente en los artículos proporcionados arri
                     "id": article["id"],
                     "contenido": article["contenido"],
                     "similarity_score": article["similarity_score"],
-                    "relevance": "Alta" if article["similarity_score"] > 0.7 else 
+                    "relevance": "Alta" if article["similarity_score"] > 0.7 else
                                "Media" if article["similarity_score"] > 0.5 else "Baja"
                 })
 
@@ -157,7 +157,7 @@ Por favor, responde basándote únicamente en los artículos proporcionados arri
     def get_service_info(self) -> Dict[str, Any]:
         """Obtiene información sobre el servicio RAG"""
         embedding_stats = self.embedding_service.get_collection_stats()
-        
+
         return {
             "service_type": "RAG (Retrieval-Augmented Generation)",
             "llm_provider": "Mistral AI",
