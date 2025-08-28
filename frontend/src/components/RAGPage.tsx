@@ -47,50 +47,47 @@ const RAGPage: React.FC = () => {
   };
 
   const getConfidenceColor = (confidence: number) => {
-    if (confidence >= 0.7) return 'text-green-600 bg-green-100';
-    if (confidence >= 0.5) return 'text-yellow-600 bg-yellow-100';
-    return 'text-red-600 bg-red-100';
+    if (confidence >= 0.7) return 'bg-green-50 text-green-700 border-green-200';
+    if (confidence >= 0.5) return 'bg-amber-50 text-amber-700 border-amber-200';
+    return 'bg-red-50 text-red-700 border-red-200';
   };
 
   const getRelevanceColor = (relevance: string) => {
     switch (relevance.toLowerCase()) {
-      case 'alta': return 'bg-green-100 text-green-800';
-      case 'media': return 'bg-yellow-100 text-yellow-800';
-      case 'baja': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'alta': return 'bg-green-50 text-green-700 border-green-200';
+      case 'media': return 'bg-amber-50 text-amber-700 border-amber-200';
+      case 'baja': return 'bg-red-50 text-red-700 border-red-200';
+      default: return 'bg-muted text-muted-foreground border-border';
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        {/* Header con información del sistema */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center mb-4">
-            <div className="bg-white p-3 rounded-full shadow-lg mr-4">
-              <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-              </svg>
-            </div>
-            <div>
-              <h1 className="text-4xl font-bold text-gray-900 mb-2">
-                Asistente Legal RAG
-              </h1>
-              <p className="text-lg text-gray-600">
-                Consulta inteligente sobre la Ley 109 - Código de Seguridad Vial
-              </p>
-            </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+      <div className="max-w-4xl mx-auto px-6 py-12">
+        {/* Header */}
+        <div className="text-center mb-12 animate-fade-in">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-primary rounded-2xl mb-6 shadow-sm">
+            <svg className="w-8 h-8 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+            </svg>
           </div>
+
+          <h1 className="text-4xl font-bold tracking-tight text-foreground mb-4">
+            Asistente Legal RAG
+          </h1>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Consulta inteligente sobre la Ley 109 - Código de Seguridad Vial
+          </p>
 
           {/* Estado del sistema */}
           {health && (
-            <div className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium ${
+            <div className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium mt-6 border ${
               health.rag_enabled 
-                ? 'bg-green-100 text-green-800 border border-green-200' 
-                : 'bg-yellow-100 text-yellow-800 border border-yellow-200'
+                ? 'bg-green-50 text-green-700 border-green-200' 
+                : 'bg-amber-50 text-amber-700 border-amber-200'
             }`}>
               <div className={`w-2 h-2 rounded-full mr-2 ${
-                health.rag_enabled ? 'bg-green-500' : 'bg-yellow-500'
+                health.rag_enabled ? 'bg-green-500' : 'bg-amber-500'
               }`}></div>
               {health.rag_enabled 
                 ? `RAG con ${health.llm_provider} • ${health.total_articles} artículos`
@@ -101,34 +98,38 @@ const RAGPage: React.FC = () => {
         </div>
 
         {/* Formulario de consulta */}
-        <div className="bg-white rounded-2xl shadow-xl p-6 mb-8">
-          <form onSubmit={handleRAGChat} className="space-y-4">
+        <div className="card p-8 mb-8 animate-slide-up shadow-sm border">
+          <form onSubmit={handleRAGChat} className="space-y-6">
             <div>
-              <label htmlFor="query" className="block text-sm font-medium text-gray-700 mb-2">
-                Haz tu consulta sobre la Ley 109
+              <label htmlFor="query" className="block text-sm font-medium text-foreground mb-3">
+                Realiza tu consulta sobre la Ley 109
               </label>
               <textarea
                 id="query"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Ejemplo: ¿Cuáles son las sanciones por exceso de velocidad? ¿Qué dice sobre el uso del cinturón de seguridad?"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                rows={3}
+                className="w-full px-4 py-3 border border-input rounded-lg bg-background focus:ring-2 focus:ring-ring focus:border-transparent resize-none text-sm transition-all duration-200 placeholder:text-muted-foreground"
+                rows={4}
                 disabled={loading || !health?.rag_enabled}
+                maxLength={500}
               />
-            </div>
-            <div className="flex justify-between items-center">
-              <div className="text-sm text-gray-500">
-                {query.length}/500 caracteres
+              <div className="flex justify-between items-center mt-2">
+                <div className="text-xs text-muted-foreground">
+                  {query.length}/500 caracteres
+                </div>
               </div>
+            </div>
+
+            <div className="flex justify-end">
               <button
                 type="submit"
                 disabled={loading || !query.trim() || !health?.rag_enabled}
-                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium transition-colors flex items-center"
+                className="btn-primary px-6 py-3 font-medium"
               >
                 {loading ? (
                   <>
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
@@ -136,7 +137,7 @@ const RAGPage: React.FC = () => {
                   </>
                 ) : (
                   <>
-                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                     </svg>
                     Consultar
@@ -149,9 +150,9 @@ const RAGPage: React.FC = () => {
 
         {/* Error */}
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-            <div className="flex">
-              <svg className="w-5 h-5 text-red-400 mr-3 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+          <div className="card p-4 mb-6 bg-red-50 border-red-200 animate-slide-up">
+            <div className="flex items-start">
+              <svg className="w-5 h-5 text-red-500 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
               </svg>
               <div>
@@ -164,38 +165,38 @@ const RAGPage: React.FC = () => {
 
         {/* Respuesta RAG */}
         {ragResponse && !error && (
-          <div className="space-y-6">
+          <div className="space-y-6 animate-slide-up">
             {/* Respuesta principal */}
-            <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 text-white">
-                <div className="flex items-center justify-between">
+            <div className="card overflow-hidden shadow-sm border">
+              <div className="bg-primary p-6 text-primary-foreground">
+                <div className="flex items-center justify-between mb-3">
                   <h2 className="text-xl font-semibold">Respuesta del Asistente</h2>
-                  <div className={`px-3 py-1 rounded-full text-sm font-medium ${getConfidenceColor(ragResponse.confidence)}`}>
+                  <div className={`px-3 py-1.5 rounded-full text-xs font-medium border ${getConfidenceColor(ragResponse.confidence)}`}>
                     {Math.round(ragResponse.confidence * 100)}% confianza
                   </div>
                 </div>
-                <p className="text-blue-100 mt-2">"{ragResponse.query}"</p>
+                <p className="text-primary-foreground/80 text-sm">"{ragResponse.query}"</p>
               </div>
               
               <div className="p-6">
-                <div className="prose max-w-none">
-                  <div className="text-gray-800 leading-relaxed whitespace-pre-wrap">
+                <div className="prose max-w-none text-foreground leading-relaxed">
+                  <div className="whitespace-pre-wrap text-sm">
                     {ragResponse.response}
                   </div>
                 </div>
                 
                 {/* Metadatos */}
-                <div className="mt-6 pt-4 border-t border-gray-200">
-                  <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+                <div className="mt-6 pt-4 border-t border-border">
+                  <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
                     <span className="flex items-center">
-                      <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                      <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                       {ragResponse.articles_consulted} artículos consultados
                     </span>
                     {ragResponse.model_used && (
                       <span className="flex items-center">
-                        <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                           <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z" />
                         </svg>
                         {ragResponse.model_used}
@@ -206,63 +207,63 @@ const RAGPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Fuentes consultadas - Vista minimalista */}
+            {/* Fuentes consultadas */}
             {ragResponse.sources && ragResponse.sources.length > 0 && (
-              <div className="bg-white rounded-2xl shadow-xl">
-                <div className="p-6 border-b border-gray-200">
+              <div className="card shadow-sm border">
+                <div className="p-6 border-b border-border">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold text-gray-900">
+                    <h3 className="text-lg font-semibold text-foreground">
                       Artículos Consultados ({ragResponse.sources.length})
                     </h3>
                     <button
                       onClick={() => setShowSources(!showSources)}
-                      className="text-blue-600 hover:text-blue-700 font-medium text-sm flex items-center"
+                      className="btn-ghost text-xs"
                     >
-                      {showSources ? 'Ocultar' : 'Ver detalles'}
-                      <svg className={`w-4 h-4 ml-1 transition-transform ${showSources ? 'rotate-180' : ''}`} fill="currentColor" viewBox="0 0 20 20">
+                      {showSources ? 'Ocultar detalles' : 'Ver detalles'}
+                      <svg className={`w-3 h-3 ml-1 transition-transform ${showSources ? 'rotate-180' : ''}`} fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
                       </svg>
                     </button>
                   </div>
                 </div>
 
-                {/* Vista compacta de artículos */}
                 <div className="p-6">
+                  {/* Vista compacta */}
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                     {ragResponse.sources.map((source: RAGSource, index) => (
-                      <div key={source.id} className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                      <div key={source.id} className="bg-muted rounded-lg p-3 border border-border">
                         <div className="flex items-center justify-between mb-2">
-                          <span className="font-semibold text-gray-900">Art. {source.id}</span>
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getRelevanceColor(source.relevance)}`}>
+                          <span className="font-medium text-sm text-foreground">Art. {source.id}</span>
+                          <span className={`px-2 py-0.5 rounded-full text-xs font-medium border ${getRelevanceColor(source.relevance)}`}>
                             {source.relevance}
                           </span>
                         </div>
-                        <div className="text-xs text-gray-600">
+                        <div className="text-xs text-muted-foreground">
                           {Math.round(source.similarity_score * 100)}% similitud
                         </div>
                       </div>
                     ))}
                   </div>
 
-                  {/* Vista expandida de artículos */}
+                  {/* Vista expandida */}
                   {showSources && (
                     <div className="mt-6 space-y-4">
-                      <div className="border-t border-gray-200 pt-4">
-                        <h4 className="font-medium text-gray-900 mb-4">Contenido completo de los artículos:</h4>
+                      <div className="border-t border-border pt-4">
+                        <h4 className="font-medium text-foreground mb-4 text-sm">Contenido completo de los artículos:</h4>
                         {ragResponse.sources.map((source: RAGSource, index) => (
-                          <div key={source.id} className="bg-gray-50 rounded-lg p-4 mb-4 border border-gray-200">
+                          <div key={source.id} className="bg-muted rounded-lg p-4 mb-4 border border-border">
                             <div className="flex items-center justify-between mb-3">
-                              <h5 className="font-semibold text-gray-900">Artículo {source.id}</h5>
+                              <h5 className="font-semibold text-foreground text-sm">Artículo {source.id}</h5>
                               <div className="flex items-center space-x-2">
-                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getRelevanceColor(source.relevance)}`}>
+                                <span className={`px-2 py-0.5 rounded-full text-xs font-medium border ${getRelevanceColor(source.relevance)}`}>
                                   {source.relevance} relevancia
                                 </span>
-                                <span className="text-xs text-gray-500">
+                                <span className="text-xs text-muted-foreground">
                                   {Math.round(source.similarity_score * 100)}%
                                 </span>
                               </div>
                             </div>
-                            <p className="text-gray-700 text-sm leading-relaxed">
+                            <p className="text-muted-foreground text-xs leading-relaxed">
                               {source.contenido}
                             </p>
                           </div>
@@ -278,9 +279,9 @@ const RAGPage: React.FC = () => {
 
         {/* Ejemplos de consultas */}
         {!ragResponse && !loading && (
-          <div className="bg-white rounded-2xl shadow-xl p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              💡 Ejemplos de preguntas que puedes hacer:
+          <div className="card p-6 shadow-sm border animate-slide-up">
+            <h3 className="text-lg font-semibold text-foreground mb-4">
+              Ejemplos de preguntas que puedes hacer:
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {[
@@ -296,7 +297,7 @@ const RAGPage: React.FC = () => {
                 <button
                   key={index}
                   onClick={() => setQuery(example)}
-                  className="text-left p-3 bg-gray-50 hover:bg-blue-50 hover:border-blue-200 rounded-lg text-gray-700 transition-colors border border-gray-200 text-sm"
+                  className="text-left p-3 bg-muted hover:bg-accent rounded-lg text-muted-foreground hover:text-accent-foreground transition-all duration-200 border border-border text-sm"
                   disabled={!health?.rag_enabled}
                 >
                   {example}
