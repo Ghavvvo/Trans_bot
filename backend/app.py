@@ -14,6 +14,52 @@ rag_service = None
 
 # API Key de Mistral (en producción debería estar en variables de entorno)
 MISTRAL_API_KEY = "ctr92dfHdD64aPdOzliVL2tXuViR1ITJ"
+@app.route('/api/generate-test', methods=['POST'])
+def generate_traffic_test():
+    """Endpoint para generar una prueba de tránsito con preguntas aleatorias"""
+    try:
+        embedding_svc, rag_svc = initialize_services()
+        if not rag_svc:
+            return jsonify({'error': 'Servicio RAG no disponible'}), 500
+
+        data = request.get_json() if request.get_json() else {}
+        num_questions = data.get('num_questions', 20)
+
+        # Validar número de preguntas
+        if num_questions < 1 or num_questions > 50:
+            return jsonify({'error': 'El número de preguntas debe estar entre 1 y 50'}), 400
+
+        # Obtener artículos aleatorios
+        random_articles = embedding_svc.get_random_articles(num_questions)
+        
+        if not random_articles:
+            return jsonify({'error': 'No se pudieron obtener artículos para generar la prueba'}), 500
+
+        # Usar asyncio para la llamada asíncrona
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            questions = loop.run_until_complete(rag_svc.generate_test_questions(random_articles))
+            
+            if not questions:
+                return jsonify({'error': 'No se pudieron generar preguntas para la prueba'}), 500
+
+            result = {
+                'test_id': f"test_{int(asyncio.get_event_loop().time())}" if asyncio.get_event_loop() else "test_001",
+                'total_questions': len(questions),
+                'questions': questions,
+                'generated_at': asyncio.get_event_loop().time() if asyncio.get_event_loop() else None,
+                'articles_used': [article['id'] for article in random_articles]
+            }
+            
+            return jsonify(result)
+            
+        finally:
+            loop.close()
+
+    except Exception as e:
+        return jsonify({'error': f'Error al generar la prueba: {str(e)}'}), 500
+
 
 def initialize_services():
     """Inicializa los servicios de embeddings y RAG"""
@@ -161,52 +207,6 @@ def get_rag_info():
 
     except Exception as e:
         return jsonify({'error': f'Error al obtener información RAG: {str(e)}'}), 500
-
-@app.route('/api/generate-test', methods=['POST'])
-def generate_traffic_test():
-    """Endpoint para generar una prueba de tránsito con preguntas aleatorias"""
-    try:
-        embedding_svc, rag_svc = initialize_services()
-        if not rag_svc:
-            return jsonify({'error': 'Servicio RAG no disponible'}), 500
-
-        data = request.get_json() if request.get_json() else {}
-        num_questions = data.get('num_questions', 20)
-
-        # Validar número de preguntas
-        if num_questions < 1 or num_questions > 50:
-            return jsonify({'error': 'El número de preguntas debe estar entre 1 y 50'}), 400
-
-        # Obtener artículos aleatorios
-        random_articles = embedding_svc.get_random_articles(num_questions)
-
-        if not random_articles:
-            return jsonify({'error': 'No se pudieron obtener artículos para generar la prueba'}), 500
-
-        # Usar asyncio para la llamada asíncrona
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        try:
-            questions = loop.run_until_complete(rag_svc.generate_test_questions(random_articles))
-
-            if not questions:
-                return jsonify({'error': 'No se pudieron generar preguntas para la prueba'}), 500
-
-            result = {
-                'test_id': f"test_{int(asyncio.get_event_loop().time())}" if asyncio.get_event_loop() else "test_001",
-                'total_questions': len(questions),
-                'questions': questions,
-                'generated_at': asyncio.get_event_loop().time() if asyncio.get_event_loop() else None,
-                'articles_used': [article['id'] for article in random_articles]
-            }
-
-            return jsonify(result)
-
-        finally:
-            loop.close()
-
-    except Exception as e:
-        return jsonify({'error': f'Error al generar la prueba: {str(e)}'}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
