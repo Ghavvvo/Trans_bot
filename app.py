@@ -2,8 +2,12 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 import os
 import asyncio
+from dotenv import load_dotenv
 from services.embedding_service import EmbeddingService
 from services.rag_service import RAGService
+
+# Cargar variables de entorno desde .env
+load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
@@ -12,8 +16,13 @@ CORS(app)
 embedding_service = None
 rag_service = None
 
-# API Key de Mistral (en producción debería estar en variables de entorno)
-MISTRAL_API_KEY = "ctr92dfHdD64aPdOzliVL2tXuViR1ITJ"
+# Cargar API Key de Mistral desde variables de entorno
+MISTRAL_API_KEY = os.getenv('MISTRAL_API_KEY')
+
+if not MISTRAL_API_KEY:
+    print("⚠️  ADVERTENCIA: MISTRAL_API_KEY no está configurada en las variables de entorno")
+    print("   Por favor, crea un archivo .env con tu API key o configura la variable de entorno")
+
 @app.route('/api/generate-test', methods=['POST'])
 def generate_traffic_test():
     """Endpoint para generar una prueba de tránsito con preguntas aleatorias"""
